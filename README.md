@@ -14,4 +14,4 @@ TODO
 
 * Make `withdraw` not onlyOwner.
 * `withdaw` should send found to the owner, not `msg.sender`
-* If `executeRaiseTapProposal` should call `withdraw` before changing the `tap`.
+* `executeRaiseTapProposal` should call `withdraw` before changing the `tap`.
