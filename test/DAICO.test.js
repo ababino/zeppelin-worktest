@@ -3,7 +3,6 @@ import { advanceBlock } from 'zeppelin-solidity/test/helpers/advanceToBlock';
 import { increaseTimeTo, duration } from 'zeppelin-solidity/test/helpers/increaseTime';
 import latestTime from 'zeppelin-solidity/test/helpers/latestTime';
 import EVMRevert from 'zeppelin-solidity/test/helpers/EVMRevert';
-// import SimpleToken from 'zeppelin-solidity/contracts/examples/SimpleToken';
 const assertRevert = require('zeppelin-solidity/test/helpers/assertRevert')
 
 const BigNumber = web3.BigNumber;
@@ -14,7 +13,6 @@ require('chai')
   .should();
 
 const DAICO = artifacts.require('DAICO');
-// const SimpleToken = artifacts.require('../node_modules/zeppelin-solidity/contracts/examples/SimpleToken');
 const SimpleToken = artifacts.require('SimpleToken');
 
 contract('DAICO', function (accounts) {
@@ -43,28 +41,28 @@ contract('DAICO', function (accounts) {
   describe('withdraw', function () {
 
 
-    it('owner can widthraw after last withdrawal', async function () {
+    it('owner can not withdraw before last withdrawal', async function () {
       let owner = accounts[0];
       let no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
-      await this.daico.widthraw({from: owner}).should.be.fulfilled;
+      await this.daico.withdraw({from: owner}).should.be.fulfilled;
     });
 
-    it('no owner can not widthraw after end', async function () {
+    it('no one can withdraw if she is not owner', async function () {
       let no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
-      await this.daico.widthraw({from: no_owner}).should.be.rejectedWith(EVMRevert);
+      await this.daico.withdraw({from: no_owner}).should.be.rejectedWith(EVMRevert);
     });
 
-    it('owner can withdraw', async function () {
+    it('owner can withdraw after last withdrawal', async function () {
       let owner = accounts[0];
       let no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       const initial_balance = web3.eth.getBalance(owner).c[0];
-      await this.daico.widthraw({from: owner}).should.be.fulfilled;
+      await this.daico.withdraw({from: owner}).should.be.fulfilled;
       const final_balance = web3.eth.getBalance(owner).c[0];
       assert.ok(final_balance > initial_balance);
     });
@@ -76,7 +74,7 @@ contract('DAICO', function (accounts) {
       await increaseTimeTo(this.afterlastWithdrawn);
       const initial_balance = web3.eth.getBalance(owner).c[0];
       const timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp;
-      await this.daico.widthraw({from: owner});
+      await this.daico.withdraw({from: owner});
       const final_balance = web3.eth.getBalance(owner).c[0];
       assert.ok(final_balance - initial_balance <= tap * (timestamp - this.lastWithdrawn))
     });

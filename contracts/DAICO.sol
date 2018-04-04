@@ -84,7 +84,7 @@ contract DAICO is Crowdsale, Ownable {
         * @dev Only the owner can withdraw funds, and only as much as it is
         * allowed by the tap parameter.
         */
-        function widthraw() public onlyOwner {
+        function withdraw() public onlyOwner {
             require(block.timestamp > lastWithdrawn);
             uint256 allowed  = (block.timestamp - lastWithdrawn) * tap;
             uint256 amount = Math.min256(allowed, address(this).balance);
