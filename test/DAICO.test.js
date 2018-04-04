@@ -87,12 +87,30 @@ contract('DAICO', function (accounts) {
       assert.ok(!isholder);
     });
 
-    it('purchaser is holder', async function() {
+    it('if yoy did not purchased a token you are not a holder', async function() {
       let purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value}).should.be.fulfilled;
       let isholder = await this.daico.isHolder(purchaser);
       assert.ok(isholder);
     });
+
+    it('holder can propose a new tap', async function() {
+      let purchaser = accounts[4];
+      await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value}).should.be.fulfilled;
+      await this.daico.newRaiseTapProposal(tap * 2, 3600, {from: purchaser}).should.be.fulfilled;
+    });
+
+    it('if you are not a holder you cant propose a new tap', async function() {
+      let noholder = accounts[4];
+      await this.daico.newRaiseTapProposal(tap * 2, 3600, {from: noholder}).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('you can not propose lower the tap', async function() {
+      let purchaser = accounts[4];
+      await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value}).should.be.fulfilled;
+      await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser}).should.be.rejectedWith(EVMRevert);
+    });
+
 
   });
 

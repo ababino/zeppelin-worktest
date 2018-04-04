@@ -12,6 +12,4 @@ truffle test
 
 TODO
 
-* Make `withdraw` not onlyOwner.
-* `withdaw` should send found to the owner, not `msg.sender`
-* `executeRaiseTapProposal` should call `withdraw` before changing the `tap`.
+* Make `withdraw` not onlyOwner. maybe
