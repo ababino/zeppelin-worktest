@@ -8,7 +8,6 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 
 contract DAICO is Crowdsale, Ownable {
-    /*using Roles for Roles.Role;*/
     using SafeMath for uint256;
 
     uint256 public tap;
