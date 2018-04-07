@@ -58,38 +58,6 @@ contract DAICO is Crowdsale, Ownable {
         }
 
         /**
-        * @dev Add buyers to the holder list. If you want to allow holders to
-        * change after the selling period you should implement addHolder and
-        * removeHolder functions
-        */
-        function _updatePurchasingState(address _beneficiary, uint256 _weiAmount) internal {
-          isHolder[_beneficiary] = true;
-          numberOfHolders++;
-          if (numberOfHolders % iquorum == 0){
-            quorum++;
-          }
-        }
-
-        /**
-        * @dev The forwardFunds function should not send any thing to the
-        * owner. It should keep the eth to be delivered as the holders decide.
-        */
-        function _forwardFunds() internal {
-        }
-
-        /**
-        * @dev Only owner can transfer founds to herself, and only as much as
-        * it is allowed by the tap parameter.
-        */
-        function withdraw() public onlyOwner {
-            require(block.timestamp > lastWithdrawn);
-            uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
-            uint256 amount = Math.min256(allowed, this.balance);
-            owner.transfer(amount);
-            lastWithdrawn = block.timestamp;
-          }
-
-        /**
         * @dev Any holder can propose to increase the tap.
         * @param proposedNewTap The new value of the tap variable. It must be grater than the current one.
         * @param timeToDabate The time since current block, in seconds, to vote.
@@ -142,6 +110,39 @@ contract DAICO is Crowdsale, Ownable {
           Voted(proposalID, msg.sender, supportsProposal);
           return proposal.numberOfVotes;
         }
+
+        /**
+        * @dev Add buyers to the holder list. If you want to allow holders to
+        * change after the selling period you should implement addHolder and
+        * removeHolder functions
+        */
+        function _updatePurchasingState(address _beneficiary, uint256 _weiAmount) internal {
+          isHolder[_beneficiary] = true;
+          numberOfHolders++;
+          if (numberOfHolders % iquorum == 0){
+            quorum++;
+          }
+        }
+
+        /**
+        * @dev The forwardFunds function should not send any thing to the
+        * owner. It should keep the eth to be delivered as the holders decide.
+        */
+        function _forwardFunds() internal {
+        }
+
+        /**
+        * @dev Only owner can transfer founds to herself, and only as much as
+        * it is allowed by the tap parameter.
+        */
+        function withdraw() public onlyOwner {
+            require(block.timestamp > lastWithdrawn);
+            uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
+            uint256 amount = Math.min256(allowed, this.balance);
+            owner.transfer(amount);
+            lastWithdrawn = block.timestamp;
+          }
+
 
       /**
       * @dev Any one can excecute a propasal. If the voting period has ended,
