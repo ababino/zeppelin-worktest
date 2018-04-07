@@ -64,8 +64,6 @@ contract DAICO is Crowdsale, Ownable {
         * removeHolder functions
         */
         function _updatePurchasingState(address _beneficiary, uint256 _weiAmount) internal {
-          require(_beneficiary != address(0));
-          require(_weiAmount != 0);
           isHolder[_beneficiary] = true;
           numberOfHolders++;
           if (numberOfHolders % iquorum == 0){
