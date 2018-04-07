@@ -11,7 +11,6 @@ contract DAICO is Crowdsale, Ownable {
     /*using Roles for Roles.Role;*/
     using SafeMath for uint256;
 
-    ERC20 public token;
     uint256 public tap;
     uint256 public lastWithdrawn;
 
