@@ -112,6 +112,18 @@ contract DAICO is Crowdsale, Ownable {
         }
 
         /**
+        * @dev Only owner can transfer founds to herself, and only as much as
+        * it is allowed by the tap parameter.
+        */
+        function withdraw() public onlyOwner {
+            require(block.timestamp > lastWithdrawn);
+            uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
+            uint256 amount = Math.min256(allowed, this.balance);
+            owner.transfer(amount);
+            lastWithdrawn = block.timestamp;
+          }
+
+        /**
         * @dev Add buyers to the holder list. If you want to allow holders to
         * change after the selling period you should implement addHolder and
         * removeHolder functions
@@ -130,18 +142,6 @@ contract DAICO is Crowdsale, Ownable {
         */
         function _forwardFunds() internal {
         }
-
-        /**
-        * @dev Only owner can transfer founds to herself, and only as much as
-        * it is allowed by the tap parameter.
-        */
-        function withdraw() public onlyOwner {
-            require(block.timestamp > lastWithdrawn);
-            uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
-            uint256 amount = Math.min256(allowed, this.balance);
-            owner.transfer(amount);
-            lastWithdrawn = block.timestamp;
-          }
 
 
       /**
