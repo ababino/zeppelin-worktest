@@ -105,13 +105,13 @@ contract DAICO is Crowdsale, Ownable {
           require(isHolder[msg.sender]);
 
           proposalID = proposals.length++;
-          RaiseTapProposal storage p = proposals[proposalID];
-          p.author = msg.sender;
-          p.proposedNewTap = proposedNewTap;
-          p.votingDeadline = block.timestamp.add(timeToDabate);
-          p.executed = false;
-          p.numberOfVotes = 0;
-          p.numberOfPositiveVotes = 0;
+          RaiseTapProposal storage proposal = proposals[proposalID];
+          proposal.author = msg.sender;
+          proposal.proposedNewTap = proposedNewTap;
+          proposal.votingDeadline = block.timestamp.add(timeToDabate);
+          proposal.executed = false;
+          proposal.numberOfVotes = 0;
+          proposal.numberOfPositiveVotes = 0;
           RaiseTapProposalAdded(proposalID, msg.sender, proposedNewTap);
           return proposalID;
         }
@@ -130,17 +130,17 @@ contract DAICO is Crowdsale, Ownable {
         {
           require(isHolder[msg.sender]);
 
-          RaiseTapProposal storage p = proposals[proposalID];
-          require(!p.voted[msg.sender]);
-          require(p.votingDeadline < block.timestamp);
+          RaiseTapProposal storage proposal = proposals[proposalID];
+          require(!proposal.voted[msg.sender]);
+          require(proposal.votingDeadline < block.timestamp);
 
-          p.voted[msg.sender] = true;
-          p.numberOfVotes++;
+          proposal.voted[msg.sender] = true;
+          proposal.numberOfVotes++;
           if (supportsProposal) {
-            p.numberOfPositiveVotes++;
+            proposal.numberOfPositiveVotes++;
           }
           Voted(proposalID, msg.sender, supportsProposal);
-          return p.numberOfVotes;
+          return proposal.numberOfVotes;
         }
 
       /**
@@ -151,13 +151,13 @@ contract DAICO is Crowdsale, Ownable {
       * @param proposalID The ID of the proposal to execute.
       */
       function executeRaiseTapProposal(uint256 proposalID) private {
-        RaiseTapProposal storage p = proposals[proposalID];
-        require(p.votingDeadline > block.timestamp);
-        require(!p.executed);
-        p.executed = true;
-        if (p.numberOfPositiveVotes.mul(2) > p.numberOfVotes.add(quorum)){
+        RaiseTapProposal storage proposal = proposals[proposalID];
+        require(proposal.votingDeadline > block.timestamp);
+        require(!proposal.executed);
+        proposal.executed = true;
+        if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
           withdraw();
-          tap = p.proposedNewTap;
+          tap = proposal.proposedNewTap;
         }
       }
 }
