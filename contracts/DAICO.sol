@@ -9,6 +9,7 @@ import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 contract DAICO is Crowdsale, Ownable {
     /*using Roles for Roles.Role;*/
+    using SafeMath for uint256;
 
     ERC20 public token;
     uint256 public tap;
@@ -86,7 +87,7 @@ contract DAICO is Crowdsale, Ownable {
         */
         function withdraw() public onlyOwner {
             require(block.timestamp > lastWithdrawn);
-            uint256 allowed  = (block.timestamp - lastWithdrawn) * tap;
+            uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
             uint256 amount = Math.min256(allowed, address(this).balance);
             owner.transfer(amount);
             lastWithdrawn = block.timestamp;
@@ -111,7 +112,7 @@ contract DAICO is Crowdsale, Ownable {
           RaiseTapProposal storage p = proposals[proposalID];
           p.author = msg.sender;
           p.proposedNewTap = proposedNewTap;
-          p.votingDeadline = block.timestamp + timeToDabate;
+          p.votingDeadline = block.timestamp.add(timeToDabate);
           p.executed = false;
           p.numberOfVotes = 0;
           p.numberOfPositiveVotes = 0;
@@ -158,7 +159,7 @@ contract DAICO is Crowdsale, Ownable {
         require(p.votingDeadline > block.timestamp);
         require(!p.executed);
         p.executed = true;
-        if (SafeMath.mul(2, p.numberOfPositiveVotes) > SafeMath.add(p.numberOfVotes, quorum)){
+        if (p.numberOfPositiveVotes.mul(2) > p.numberOfVotes.add(quorum)){
           withdraw();
           tap = p.proposedNewTap;
         }
