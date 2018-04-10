@@ -113,6 +113,24 @@ contract DAICO is Crowdsale, Ownable {
         }
 
         /**
+        * @dev Any one can excecute a propasal. If the voting period has ended,
+        * there are more votes in favor than aginst the proposal, and the number
+        * of votes is greater than the quorum, then, the tap variable is updated
+        * to the propsed new tap.
+        * @param proposalID The ID of the proposal to execute.
+        */
+        function executeRaiseTapProposal(uint256 proposalID) public {
+          RaiseTapProposal storage proposal = proposals[proposalID];
+          require(proposal.votingDeadline > block.timestamp);
+          require(!proposal.executed);
+          proposal.executed = true;
+          if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
+            withdraw();
+            tap = proposal.proposedNewTap;
+          }
+        }
+
+        /**
         * @dev Only owner can transfer founds to herself, and only as much as
         * it is allowed by the tap parameter.
         */
@@ -145,21 +163,4 @@ contract DAICO is Crowdsale, Ownable {
         }
 
 
-      /**
-      * @dev Any one can excecute a propasal. If the voting period has ended,
-      * there are more votes in favor than aginst the proposal, and the number
-      * of votes is greater than the quorum, then, the tap variable is updated
-      * to the propsed new tap.
-      * @param proposalID The ID of the proposal to execute.
-      */
-      function executeRaiseTapProposal(uint256 proposalID) public {
-        RaiseTapProposal storage proposal = proposals[proposalID];
-        require(proposal.votingDeadline > block.timestamp);
-        require(!proposal.executed);
-        proposal.executed = true;
-        if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
-          withdraw();
-          tap = proposal.proposedNewTap;
-        }
-      }
 }
