@@ -44,7 +44,6 @@ contract DAICO is Crowdsale, Ownable {
         (
           uint256 _lastWithdrawn,
           uint256 _rate,
-          uint256 _tap,
           uint256 _iquorum,
           address _wallet,
           ERC20 _token
@@ -52,7 +51,7 @@ contract DAICO is Crowdsale, Ownable {
         public
         Crowdsale(_rate, _wallet, _token)
         {
-            tap = _tap;
+            tap = 0;
             lastWithdrawn = _lastWithdrawn;
             iquorum = _iquorum;
             quorum = 0;
