@@ -152,7 +152,7 @@ contract DAICO is Crowdsale, Ownable {
       * to the propsed new tap.
       * @param proposalID The ID of the proposal to execute.
       */
-      function executeRaiseTapProposal(uint256 proposalID) private {
+      function executeRaiseTapProposal(uint256 proposalID) public {
         RaiseTapProposal storage proposal = proposals[proposalID];
         require(proposal.votingDeadline > block.timestamp);
         require(!proposal.executed);
