@@ -42,11 +42,11 @@ contract DAICO is Crowdsale, Ownable {
 
     function DAICO
         (
-          uint256 _lastWithdrawn,
-          uint256 _rate,
-          uint256 _iquorum,
-          address _wallet,
-          ERC20 _token
+            uint256 _lastWithdrawn,
+            uint256 _rate,
+            uint256 _iquorum,
+            address _wallet,
+            ERC20 _token
         )
         public
         Crowdsale(_rate, _wallet, _token)
@@ -63,26 +63,26 @@ contract DAICO is Crowdsale, Ownable {
         * @param timeToDabate The time since current block, in seconds, to vote.
         */
         function newRaiseTapProposal(
-          uint256 proposedNewTap,
-          uint256 timeToDabate
+            uint256 proposedNewTap,
+            uint256 timeToDabate
         )
-          public
-          returns (uint256 proposalID)
+            public
+            returns (uint256 proposalID)
         {
-          require(proposedNewTap > tap);
-          require(isHolder[msg.sender]);
-          require(block.timestamp > lastWithdrawn);
+            require(proposedNewTap > tap);
+            require(isHolder[msg.sender]);
+            require(block.timestamp > lastWithdrawn);
 
-          proposalID = proposals.length++;
-          RaiseTapProposal storage proposal = proposals[proposalID];
-          proposal.author = msg.sender;
-          proposal.proposedNewTap = proposedNewTap;
-          proposal.votingDeadline = block.timestamp.add(timeToDabate);
-          proposal.executed = false;
-          proposal.numberOfVotes = 0;
-          proposal.numberOfPositiveVotes = 0;
-          RaiseTapProposalAdded(proposalID, msg.sender, proposedNewTap);
-          return proposalID;
+            proposalID = proposals.length++;
+            RaiseTapProposal storage proposal = proposals[proposalID];
+            proposal.author = msg.sender;
+            proposal.proposedNewTap = proposedNewTap;
+            proposal.votingDeadline = block.timestamp.add(timeToDabate);
+            proposal.executed = false;
+            proposal.numberOfVotes = 0;
+            proposal.numberOfPositiveVotes = 0;
+            RaiseTapProposalAdded(proposalID, msg.sender, proposedNewTap);
+            return proposalID;
         }
 
         /**
@@ -91,25 +91,25 @@ contract DAICO is Crowdsale, Ownable {
         * @param supportsProposal if true the holder supports the proposal, if false she does not.
         */
         function vote(
-          uint256 proposalID,
-          bool supportsProposal
+            uint256 proposalID,
+            bool supportsProposal
         )
-          public
-          returns (uint256 voteID)
+            public
+            returns (uint256 voteID)
         {
-          require(isHolder[msg.sender]);
+            require(isHolder[msg.sender]);
 
-          RaiseTapProposal storage proposal = proposals[proposalID];
-          require(!proposal.voted[msg.sender]);
-          require(proposal.votingDeadline > block.timestamp);
+            RaiseTapProposal storage proposal = proposals[proposalID];
+            require(!proposal.voted[msg.sender]);
+            require(proposal.votingDeadline > block.timestamp);
 
-          proposal.voted[msg.sender] = true;
-          proposal.numberOfVotes++;
-          if (supportsProposal) {
-            proposal.numberOfPositiveVotes++;
-          }
-          Voted(proposalID, msg.sender, supportsProposal);
-          return proposal.numberOfVotes;
+            proposal.voted[msg.sender] = true;
+            proposal.numberOfVotes++;
+            if (supportsProposal) {
+                proposal.numberOfPositiveVotes++;
+            }
+            Voted(proposalID, msg.sender, supportsProposal);
+            return proposal.numberOfVotes;
         }
 
         /**
@@ -120,15 +120,15 @@ contract DAICO is Crowdsale, Ownable {
         * @param proposalID The ID of the proposal to execute.
         */
         function executeRaiseTapProposal(uint256 proposalID) public {
-          RaiseTapProposal storage proposal = proposals[proposalID];
-          require(proposal.votingDeadline < block.timestamp);
-          require(!proposal.executed);
-          require(proposal.proposedNewTap > tap);
-          proposal.executed = true;
-          if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
-            withdraw();
-            tap = proposal.proposedNewTap;
-          }
+            RaiseTapProposal storage proposal = proposals[proposalID];
+            require(proposal.votingDeadline < block.timestamp);
+            require(!proposal.executed);
+            require(proposal.proposedNewTap > tap);
+            proposal.executed = true;
+            if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
+                withdraw();
+                tap = proposal.proposedNewTap;
+            }
         }
 
         /**
@@ -149,11 +149,11 @@ contract DAICO is Crowdsale, Ownable {
         * removeHolder functions
         */
         function _updatePurchasingState(address _beneficiary, uint256 _weiAmount) internal {
-          isHolder[_beneficiary] = true;
-          numberOfHolders++;
-          if (numberOfHolders % iquorum == 0){
-            quorum++;
-          }
+            isHolder[_beneficiary] = true;
+            numberOfHolders++;
+            if (numberOfHolders % iquorum == 0){
+                quorum++;
+            }
         }
 
         /**
