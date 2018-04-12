@@ -148,7 +148,12 @@ contract DAICO is Crowdsale, Ownable {
         * change after the selling period you should implement addHolder and
         * removeHolder functions
         */
-        function _updatePurchasingState(address _beneficiary, uint256 _weiAmount) internal {
+        function _updatePurchasingState(
+            address _beneficiary,
+            uint256 _weiAmount
+        )
+            internal
+        {
             isHolder[_beneficiary] = true;
             numberOfHolders++;
             if (numberOfHolders % iquorum == 0){
