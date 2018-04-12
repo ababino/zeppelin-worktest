@@ -63,29 +63,6 @@ contract('DAICO', function (accounts) {
       await this.daico.withdraw({from: no_owner}).should.be.rejectedWith(EVMRevert);
     });
 
-    // for tap
-    // it('owner can withdraw after last withdrawal', async function () {
-    //   let owner = accounts[0];
-    //   let no_owner = accounts[3];
-    //   await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
-    //   await increaseTimeTo(this.afterlastWithdrawn);
-    //   const initial_balance = web3.eth.getBalance(owner).c[0];
-    //   await this.daico.withdraw({from: owner}).should.be.fulfilled;
-    //   const final_balance = web3.eth.getBalance(owner).c[0];
-    //   assert.ok(final_balance > initial_balance);
-    // });
-    //
-    // it('owner can t withdraw more than tap times time', async function () {
-    //   let owner = accounts[0];
-    //   let no_owner = accounts[3];
-    //   await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
-    //   await increaseTimeTo(this.afterlastWithdrawn);
-    //   const initial_balance = web3.eth.getBalance(owner).c[0];
-    //   const timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp;
-    //   await this.daico.withdraw({from: owner});
-    //   const final_balance = web3.eth.getBalance(owner).c[0];
-    //   assert.ok(final_balance - initial_balance <= tap * (timestamp - this.lastWithdrawn))
-    // });
   });
 
   describe('proposals', function () {
@@ -200,8 +177,28 @@ contract('DAICO', function (accounts) {
       let new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==100);
     });
-
-
   });
 
+  describe('tap', function () {
+
+    it('owner cant withdraw before last withdrawal', async function () {
+      let owner = accounts[0];
+      let no_owner = accounts[3];
+      await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
+      const initial_balance = web3.eth.getBalance(owner).c[0];
+      await this.daico.withdraw({from: owner}).should.be.rejectedWith(EVMRevert);
+    });
+  //
+  // it('owner can t withdraw more than tap times time', async function () {
+  //   let owner = accounts[0];
+  //   let no_owner = accounts[3];
+  //   await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
+  //   await increaseTimeTo(this.afterlastWithdrawn);
+  //   const initial_balance = web3.eth.getBalance(owner).c[0];
+  //   const timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp;
+  //   await this.daico.withdraw({from: owner});
+  //   const final_balance = web3.eth.getBalance(owner).c[0];
+  //   assert.ok(final_balance - initial_balance <= tap * (timestamp - this.lastWithdrawn))
+  // });
+  });
 });
