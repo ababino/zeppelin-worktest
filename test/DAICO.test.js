@@ -132,7 +132,7 @@ contract('DAICO', function (accounts) {
       await this.daico.vote(0, true, {from: purchaser}).should.be.rejectedWith(EVMRevert);
     });
 
-    it('if pass propasal can be executed', async function() {
+    it('passed propasal can be executed', async function() {
       let purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
