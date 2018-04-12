@@ -12,7 +12,7 @@ npm test
 
 TODO
 
-* Make `withdraw` not onlyOwner. maybe
+* Make `withdraw` not onlyOwner. maybe. now onlyOwner can execute a proposal because it trigers a withdrawal.
 
  OBS
 
