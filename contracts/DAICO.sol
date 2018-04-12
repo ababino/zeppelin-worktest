@@ -121,7 +121,7 @@ contract DAICO is Crowdsale, Ownable {
         */
         function executeRaiseTapProposal(uint256 proposalID) public {
           RaiseTapProposal storage proposal = proposals[proposalID];
-          require(proposal.votingDeadline > block.timestamp);
+          require(proposal.votingDeadline < block.timestamp);
           require(!proposal.executed);
           proposal.executed = true;
           if (proposal.numberOfPositiveVotes.mul(2) > proposal.numberOfVotes.add(quorum)){
