@@ -185,20 +185,36 @@ contract('DAICO', function (accounts) {
       let owner = accounts[0];
       let no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
-      const initial_balance = web3.eth.getBalance(owner).c[0];
       await this.daico.withdraw({from: owner}).should.be.rejectedWith(EVMRevert);
     });
-  //
-  // it('owner can t withdraw more than tap times time', async function () {
-  //   let owner = accounts[0];
-  //   let no_owner = accounts[3];
-  //   await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
-  //   await increaseTimeTo(this.afterlastWithdrawn);
-  //   const initial_balance = web3.eth.getBalance(owner).c[0];
-  //   const timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp;
-  //   await this.daico.withdraw({from: owner});
-  //   const final_balance = web3.eth.getBalance(owner).c[0];
-  //   assert.ok(final_balance - initial_balance <= tap * (timestamp - this.lastWithdrawn))
-  // });
+
+    it('initial tap is zero and owner can withdraw zero', async function () {
+      let owner = accounts[0];
+      let no_owner = accounts[3];
+      await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
+      await increaseTimeTo(this.afterlastWithdrawn);
+      const initial_balance = web3.eth.getBalance(owner).c[0];
+      await this.daico.withdraw({from: owner}).should.be.fulfilled;
+      const final_balance = web3.eth.getBalance(owner).c[0];
+      assert.ok(final_balance < initial_balance);
+    });
+
+    it('owner can withdraw as much as tap times time', async function () {
+      let owner = accounts[0];
+      let no_owner = accounts[3];
+      await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
+      await increaseTimeTo(this.afterlastWithdrawn);
+      await this.daico.newRaiseTapProposal(tap, 3600, {from: no_owner});
+      await this.daico.vote(0, true, {from: no_owner}).should.be.fulfilled;;
+      await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
+      await this.daico.executeRaiseTapProposal(0).should.be.fulfilled;
+      await increaseTimeTo(latestTime() + duration.seconds(1000000));
+      const initial_balance = web3.eth.getBalance(owner).c[0];
+      const out = await this.daico.withdraw({from: owner});
+      const fee = out.receipt.gasUsed / 1000;
+      const final_balance = web3.eth.getBalance(owner).c[0];
+      assert.ok(final_balance - initial_balance - 100 + fee < 1);
+    });
+
   });
 });
