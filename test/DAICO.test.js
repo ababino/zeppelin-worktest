@@ -119,8 +119,31 @@ contract('DAICO', function (accounts) {
       let purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
+      await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser}).should.be.fulfilled;
+      await this.daico.vote(0, true, {from: purchaser}).should.be.fulfilled;
+    });
+
+    it('no one can vote a proposal after votingDeadline', async function() {
+      let purchaser = accounts[4];
+      await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
+      await increaseTimeTo(this.afterlastWithdrawn);
+      const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
+      await increaseTimeTo(latestTime() + duration.hours(1));
+      await this.daico.vote(0, true, {from: purchaser}).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('if pass propasal can be executed', async function() {
+      let purchaser = accounts[4];
+      await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
+      await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
       await this.daico.vote(0, true, {from: purchaser}).should.be.fulfilled;;
+      await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
+      let old_tap = await this.daico.tap();
+      assert.ok(old_tap.c[0]==0);
+      await this.daico.executeRaiseTapProposal(0);
+      let new_tap = await this.daico.tap();
+      assert.ok(new_tap.c[0]==100);
     });
 
     // it('you can not propose lower the tap', async function() {
