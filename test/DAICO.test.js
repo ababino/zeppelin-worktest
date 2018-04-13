@@ -42,22 +42,22 @@ contract('DAICO', function (accounts) {
 
 
     it('owner can withdraw after last withdrawal', async function () {
-      let owner = accounts[0];
-      let no_owner = accounts[3];
+      const owner = accounts[0];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.withdraw({from: owner}).should.be.fulfilled;
     });
 
     it('owner can not withdraw before last withdrawal', async function () {
-      let owner = accounts[0];
-      let no_owner = accounts[3];
+      const owner = accounts[0];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await this.daico.withdraw({from: owner}).should.be.rejectedWith(EVMRevert);
     });
 
     it('no one can withdraw if she is not owner', async function () {
-      let no_owner = accounts[3];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.withdraw({from: no_owner}).should.be.rejectedWith(EVMRevert);
@@ -67,33 +67,32 @@ contract('DAICO', function (accounts) {
 
   describe('proposals', function () {
     it('no purchaser no holder', async function() {
-      let purchaser = accounts[5];
-      let isholder = await this.daico.isHolder(purchaser);
+      const isholder = await this.daico.isHolder(accounts[2]);
       assert.ok(!isholder);
     });
 
     it('if you did not purchased a token you are not a holder', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value}).should.be.fulfilled;
       let isholder = await this.daico.isHolder(purchaser);
       assert.ok(isholder);
     });
 
     it('holder can propose a new tap in tap mode', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.newRaiseTapProposal(tap * 2, 3600, {from: purchaser}).should.be.fulfilled;
     });
 
     it('if you are not a holder you cant propose a new tap', async function() {
-      let noholder = accounts[4];
+      const noholder = accounts[4];
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.newRaiseTapProposal(tap * 2, 3600, {from: noholder}).should.be.rejectedWith(EVMRevert);
     });
 
     it('holder can vote a proposal in time', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser}).should.be.fulfilled;
@@ -101,7 +100,7 @@ contract('DAICO', function (accounts) {
     });
 
     it('no one can vote a proposal after votingDeadline', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
@@ -110,61 +109,61 @@ contract('DAICO', function (accounts) {
     });
 
     it('passed propasal can be executed', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
       await this.daico.vote(0, true, {from: purchaser}).should.be.fulfilled;;
       await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
-      let old_tap = await this.daico.tap();
+      const old_tap = await this.daico.tap();
       assert.ok(old_tap.c[0]==0);
       await this.daico.executeRaiseTapProposal(0);
-      let new_tap = await this.daico.tap();
+      const new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==100);
     });
 
     it('rejected propasal can not be executed', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
       await this.daico.vote(0, false, {from: purchaser}).should.be.fulfilled;;
       await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
-      let old_tap = await this.daico.tap();
+      const old_tap = await this.daico.tap();
       assert.ok(old_tap.c[0]==0);
       await this.daico.executeRaiseTapProposal(0);
-      let new_tap = await this.daico.tap();
+      const new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==0);
     });
 
     it('propasal without quorum can not be executed', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
       await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
-      let old_tap = await this.daico.tap();
+      const old_tap = await this.daico.tap();
       assert.ok(old_tap.c[0]==0);
       await this.daico.executeRaiseTapProposal(0);
-      let new_tap = await this.daico.tap();
+      const new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==0);
     });
 
     it('you can not propose lower the tap', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       const proposalID = await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
       await this.daico.vote(0, true, {from: purchaser}).should.be.fulfilled;;
       await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
       await this.daico.executeRaiseTapProposal(0);
-      let new_tap = await this.daico.tap();
+      const new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==100);
       await this.daico.newRaiseTapProposal(99, 3600, {from: purchaser}).should.be.rejectedWith(EVMRevert);
     });
 
     it('old propose can not be executed if it lowers the tap', async function() {
-      let purchaser = accounts[4];
+      const purchaser = accounts[4];
       await this.daico.buyTokens(purchaser, {from: purchaser, value: higher_value});
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.newRaiseTapProposal(100, 3600, {from: purchaser});
@@ -174,7 +173,7 @@ contract('DAICO', function (accounts) {
       await increaseTimeTo(latestTime() + duration.hours(2) + duration.seconds(1));
       await this.daico.executeRaiseTapProposal(0).should.be.fulfilled;
       await this.daico.executeRaiseTapProposal(1).should.be.rejectedWith(EVMRevert);
-      let new_tap = await this.daico.tap();
+      const new_tap = await this.daico.tap();
       assert.ok(new_tap.c[0]==100);
     });
   });
@@ -182,15 +181,15 @@ contract('DAICO', function (accounts) {
   describe('tap', function () {
 
     it('owner cant withdraw before last withdrawal', async function () {
-      let owner = accounts[0];
-      let no_owner = accounts[3];
+      const owner = accounts[0];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await this.daico.withdraw({from: owner}).should.be.rejectedWith(EVMRevert);
     });
 
     it('initial tap is zero and owner can withdraw zero', async function () {
-      let owner = accounts[0];
-      let no_owner = accounts[3];
+      const owner = accounts[0];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       const initial_balance = web3.eth.getBalance(owner).c[0];
@@ -200,8 +199,8 @@ contract('DAICO', function (accounts) {
     });
 
     it('owner can withdraw as much as tap times time', async function () {
-      let owner = accounts[0];
-      let no_owner = accounts[3];
+      const owner = accounts[0];
+      const no_owner = accounts[3];
       await this.daico.buyTokens(no_owner, {from: no_owner, value: higher_value}).should.be.fulfilled;
       await increaseTimeTo(this.afterlastWithdrawn);
       await this.daico.newRaiseTapProposal(tap, 3600, {from: no_owner});
