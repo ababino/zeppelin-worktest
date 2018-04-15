@@ -161,9 +161,17 @@ contract('DAICO', function (accounts) {
 
         it('passed propasal can be executed', async function() {
           await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
+          let proposal = await this.daico.proposals.call(this.proposalID);
+          let executed = proposal[3]
+          assert.ok(!executed)
           await this.daico.executeRaiseTapProposal(this.proposalID);
           const newTap = await this.daico.tap();
           newTap.should.be.bignumber.equal(100)
+          proposal = await this.daico.proposals.call(this.proposalID);
+          executed = proposal[3]
+          assert.ok(executed)
+          const lastWithdrawn = await this.daico.lastWithdrawn();
+          lastWithdrawn.should.be.bignumber.equal(latestTime())
         });
 
         describe('after a proposal is passed', function(){
