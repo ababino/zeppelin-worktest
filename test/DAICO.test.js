@@ -59,9 +59,9 @@ contract('DAICO', function (accounts) {
 
     it('no one can withdraw', async function () {
       await this.daico.withdraw({from: this.owner}).should.be.rejectedWith(EVMRevert);
-      assert.ok(this.owner_initial_balance >= web3.eth.getBalance(this.owner))
+      this.owner_initial_balance.should.be.bignumber.at.least(web3.eth.getBalance(this.owner))
       await this.daico.withdraw({from: this.no_owner}).should.be.rejectedWith(EVMRevert);
-      assert.ok(this.owner_initial_balance >= web3.eth.getBalance(this.owner))
+      this.owner_initial_balance.should.be.bignumber.at.least(web3.eth.getBalance(this.owner))
     });
 
     it('no one can propose a new tap', async function() {
@@ -73,7 +73,7 @@ contract('DAICO', function (accounts) {
 
     it('initial value of tap is zero', async function(){
       const currentTap = await this.daico.tap();
-      assert.ok(currentTap.eq(new BigNumber(0)));
+      expect(currentTap).to.be.zero;
     });
 
   });
@@ -87,7 +87,7 @@ contract('DAICO', function (accounts) {
 
     it('owner can withdraw but tap is zero', async function () {
       await this.daico.withdraw({from: this.owner}).should.be.fulfilled;
-      assert.ok(this.owner_initial_balance >= web3.eth.getBalance(this.owner))
+      this.owner_initial_balance.should.be.bignumber.at.least(web3.eth.getBalance(this.owner))
     });
 
     it('no one can withdraw if she is not owner', async function () {
@@ -124,15 +124,15 @@ contract('DAICO', function (accounts) {
         let proposal = await this.daico.proposals.call(this.proposalID)
         const initalNumberOfVotes = proposal[4];
         const initalNumberOfPositiveVotes = proposal[5];
-        assert.ok(initalNumberOfVotes.eq(new BigNumber(0)));
-        assert.ok(initalNumberOfPositiveVotes.eq(new BigNumber(0)));
+        expect(initalNumberOfVotes).to.be.zero;
+        expect(initalNumberOfPositiveVotes).to.be.zero;
         await this.daico.vote(this.proposalID, true, {from: this.purchaser}).should.be.fulfilled;
         await this.daico.vote(this.proposalID, true, {from: this.no_purchaser}).should.be.rejectedWith(EVMRevert);
         proposal = await this.daico.proposals.call(this.proposalID)
         const finalNumberOfVotes = proposal[4];
         const finalNumberOfPositiveVotes = proposal[5];
-        assert.ok(finalNumberOfVotes.eq(initalNumberOfVotes.plus(new BigNumber(1))));
-        assert.ok(finalNumberOfPositiveVotes.eq(initalNumberOfPositiveVotes.plus(new BigNumber(1))));
+        finalNumberOfVotes.should.be.bignumber.equal(1);
+        finalNumberOfPositiveVotes.should.be.bignumber.equal(1);
       });
 
       it('no one can vote a proposal after votingDeadline', async function() {
@@ -162,8 +162,8 @@ contract('DAICO', function (accounts) {
         it('passed propasal can be executed', async function() {
           await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
           await this.daico.executeRaiseTapProposal(this.proposalID);
-          const new_tap = await this.daico.tap();
-          assert.ok(new_tap==100);
+          const newTap = await this.daico.tap();
+          newTap.should.be.bignumber.equal(100)
         });
 
         describe('after a proposal is passed', function(){
@@ -188,7 +188,7 @@ contract('DAICO', function (accounts) {
             const fee = gasUsed.mul(gasPrice);
             const finalBalance = web3.eth.getBalance(this.owner);
             const expectedFinalBalance = initialBalance.add(expectedWithdraw).minus(fee)
-            assert.ok(finalBalance.eq(expectedFinalBalance))
+            finalBalance.should.be.bignumber.equal(expectedFinalBalance)
           });
 
 
@@ -197,7 +197,7 @@ contract('DAICO', function (accounts) {
           });
 
           it('cant propse lower the tap', async function(){
-            const lowTap = this.newTap - 1;
+            const lowTap = this.newTap.minus(new BigNumber(1));
             await this.daico.newRaiseTapProposal(lowTap, 3600, {from: this.purchaser}).should.be.rejectedWith(EVMRevert);
           });
 
@@ -205,7 +205,7 @@ contract('DAICO', function (accounts) {
             await increaseTimeTo(latestTime() + duration.hours(2) + duration.seconds(1));
             await this.daico.executeRaiseTapProposal(this.oldProposalWithLowTapID).should.be.rejectedWith(EVMRevert);
             const currentTap = await this.daico.tap();
-            assert.ok(currentTap.eq(this.newTap));
+            currentTap.should.be.bignumber.equal(this.newTap)
           });
 
           it('can propose a greater tap', async function(){
@@ -218,15 +218,15 @@ contract('DAICO', function (accounts) {
         it('rejected propasal can not be executed', async function() {
           await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
           await this.daico.executeRaiseTapProposal(this.rejectedProposalID);
-          const new_tap = await this.daico.tap();
-          assert.ok(new_tap==0);
+          const newTap = await this.daico.tap();
+          newTap.should.be.zero
         });
 
         it('propasal without quorum can not be executed', async function() {
           await increaseTimeTo(latestTime() + duration.hours(1) + duration.seconds(1));
           await this.daico.executeRaiseTapProposal(this.proposalWithoutQuorumID);
-          const new_tap = await this.daico.tap();
-          assert.ok(new_tap==0);
+          const newTap = await this.daico.tap();
+          newTap.should.be.zero
         });
 
       });
