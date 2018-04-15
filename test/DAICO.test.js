@@ -188,7 +188,7 @@ contract('DAICO', function (accounts) {
             const initialBalance = web3.eth.getBalance(this.owner);
             const out = await this.daico.withdraw({from: this.owner});
             const secondWithdraw = await this.daico.lastWithdrawn();
-            assert.ok(secondWithdraw.eq(new BigNumber(latestTime())));
+            secondWithdraw.should.be.bignumber.equal(latestTime())
             const expectedWithdraw = this.newTap.mul(secondWithdraw.minus(firstWithdraw))
             const gasUsed = new BigNumber(out.receipt.gasUsed);
             const tx = await web3.eth.getTransaction(out.tx);
