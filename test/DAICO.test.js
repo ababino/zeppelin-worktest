@@ -121,8 +121,18 @@ contract('DAICO', function (accounts) {
       });
 
       it('holder can vote a proposal before votingDeadline', async function() {
+        let proposal = await this.daico.proposals.call(this.proposalID)
+        const initalNumberOfVotes = proposal[4];
+        const initalNumberOfPositiveVotes = proposal[5];
+        assert.ok(initalNumberOfVotes.eq(new BigNumber(0)));
+        assert.ok(initalNumberOfPositiveVotes.eq(new BigNumber(0)));
         await this.daico.vote(this.proposalID, true, {from: this.purchaser}).should.be.fulfilled;
         await this.daico.vote(this.proposalID, true, {from: this.no_purchaser}).should.be.rejectedWith(EVMRevert);
+        proposal = await this.daico.proposals.call(this.proposalID)
+        const finalNumberOfVotes = proposal[4];
+        const finalNumberOfPositiveVotes = proposal[5];
+        assert.ok(finalNumberOfVotes.eq(initalNumberOfVotes.plus(new BigNumber(1))));
+        assert.ok(finalNumberOfPositiveVotes.eq(initalNumberOfPositiveVotes.plus(new BigNumber(1))));
       });
 
       it('no one can vote a proposal after votingDeadline', async function() {
