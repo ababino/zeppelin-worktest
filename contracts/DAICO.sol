@@ -52,6 +52,7 @@ contract DAICO is Crowdsale {
     * it is allowed by the tap parameter.
     */
     function withdraw() public {
+        require(msg.sender == wallet);
         daicoGovern.validateWithdrawal();
         uint256 amount = daicoGovern.updateAmountAvailableToWithdraw();
         amount = Math.min256(amount, this.balance);
