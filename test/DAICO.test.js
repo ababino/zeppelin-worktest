@@ -50,17 +50,13 @@ contract('DAICO', function (accounts) {
 
     it('tokens can be bought and buyers are holders', async function () {
       await this.daico.buyTokens(this.purchaser, {from: this.purchaser, value: higher_value}).should.be.fulfilled;
-      const isholder = await this.daicoGovern.isHolder(this.purchaser);
+      let isholder = await this.daicoGovern.isHolder(this.purchaser);
       assert.ok(isholder);
-      // await this.daicoGovern.addHolder(this.no_purchaser, {from: this.no_purchaser}).should.be.rejectedWith(EVMRevert);
-      // await this.daicoGovern.addHolder(this.no_purchaser, {from: this.owner}).should.be.rejectedWith(EVMRevert);
-
-    })
-
-    it('if you dont buy you are not a holder', async function() {
-      const isholder = await this.daicoGovern.isHolder(this.no_purchaser);
+      await this.daicoGovern.addHolder(this.no_purchaser, {from: this.no_purchaser}).should.be.rejectedWith(EVMRevert);
+      await this.daicoGovern.addHolder(this.no_purchaser, {from: this.owner}).should.be.rejectedWith(EVMRevert);
+      isholder = await this.daicoGovern.isHolder(this.no_purchaser);
       assert.ok(!isholder);
-    });
+    })
 
     it('no one can withdraw', async function () {
       await this.daico.withdraw({from: this.owner}).should.be.rejectedWith(EVMRevert);
