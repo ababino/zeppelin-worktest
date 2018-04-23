@@ -20,7 +20,6 @@ contract('DAICO', function (accounts) {
   const rate = new BigNumber(1);
   const tap = 10000000000;
   const iquorum = 3;
-  const wallet = accounts[1];
   const value = ether(1);
   const higher_value = ether(3);
   const tokenSupply = new BigNumber('1e22');
@@ -40,7 +39,7 @@ contract('DAICO', function (accounts) {
     this.owner_initial_balance = web3.eth.getBalance(this.owner);
     this.token = await SimpleToken.new();
     // this.daicoGovern = await DaicoGovern.new(this.lastWithdrawn, iquorum);
-    this.daico = await DAICO.new(rate, wallet, this.token.address, this.lastWithdrawn, iquorum);
+    this.daico = await DAICO.new(rate, this.owner, this.token.address, this.lastWithdrawn, iquorum);
     this.daicoGovern = DaicoGovern.at(await this.daico.daicoGovernAddress())
     await this.token.transfer(this.daico.address, tokenSupply);
 
