@@ -43,6 +43,7 @@ contract DaicoGovern is Ownable {
         lastWithdrawn = _lastWithdrawn;
         iquorum = _iquorum;
         quorum = 0;
+        amountAvailableToWithdraw = 0;
     }
 
     /**
@@ -122,9 +123,8 @@ contract DaicoGovern is Ownable {
     /**
     * @dev before a withdrawal validateWithdrawal should be called.
     */
-    function validateWithdrawal(address sender) public {
+    function validateWithdrawal() public {
       require(block.timestamp > lastWithdrawn);
-      require(sender == owner);
     }
 
     /**
@@ -133,18 +133,18 @@ contract DaicoGovern is Ownable {
     function updateAmountAvailableToWithdraw() public returns (uint256 amount){
       uint256 allowed  = block.timestamp.sub(lastWithdrawn).mul(tap);
       lastWithdrawn = block.timestamp;
-      amountAvailableToWithdraw = Math.min256(allowed, this.balance);
+      amountAvailableToWithdraw = amountAvailableToWithdraw.add(allowed);
       return amountAvailableToWithdraw;
     }
 
     /**
     * @dev after a withdrawal updateLastWithdrawal should be called.
     */
-    function amountAvailableToWithdrawAfterWithdrawal() {
-        amountAvailableToWithdraw = 0;
+    function amountAvailableToWithdrawAfterWithdrawal(uint256 withdrawn) onlyOwner {
+        amountAvailableToWithdraw = amountAvailableToWithdraw.sub(withdrawn);
       }
 
-    function addHolder(address holderAdress) {
+    function addHolder(address holderAdress) onlyOwner {
       isHolder[holderAdress] = true;
       numberOfHolders++;
       if (numberOfHolders % iquorum == 0){
