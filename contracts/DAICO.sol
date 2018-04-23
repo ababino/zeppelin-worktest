@@ -11,8 +11,8 @@ import './DaicoGovern.sol';
 contract DAICO is Crowdsale {
     using SafeMath for uint256;
 
-    DaicoGovern daicoGovern;
-    uint256 public tap;
+    DaicoGovern public daicoGovern;
+    address public daicoGovernAddress;
     uint256 public lastWithdrawn;
 
     /*iquorum is the ivnerse quorum. 3 is a 1/3, and so on.*/
@@ -40,43 +40,43 @@ contract DAICO is Crowdsale {
         mapping (address => bool) voted;
     }
 
-    function DAICO(uint256 _rate, address _wallet, ERC20 _token, address _daicoGovern) Crowdsale(_rate, _wallet, _token) public {
-      /*Crowdsale(_rate, _wallet, _token);*/
-      daicoGovern = DaicoGovern(_daicoGovern);
+    function DAICO(uint256 _rate, address _wallet, ERC20 _token, uint256 _lastWithdrawn, uint256 _iquorum) Crowdsale(_rate, _wallet, _token) public {
+      daicoGovern = new DaicoGovern(_lastWithdrawn, _iquorum);
+      daicoGovernAddress = address(daicoGovern);
     }
 
 
-        /**
-        * @dev Only owner can transfer founds to herself, and only as much as
-        * it is allowed by the tap parameter.
-        */
-        function withdraw() public {
-            daicoGovern.validateWithdrawal(msg.sender);
-            uint256 amount = daicoGovern.updateAmountAvailableToWithdraw();
-            msg.sender.transfer(amount);
-            daicoGovern.amountAvailableToWithdrawAfterWithdrawal();
-          }
 
-        /**
-        * @dev Add buyers to the holder list. If you want to allow holders to
-        * change after the selling period you should implement addHolder and
-        * removeHolder functions
-        */
-        function _updatePurchasingState(
-            address _beneficiary,
-            uint256 _weiAmount
-        )
-            internal
-        {
-            daicoGovern.addHolder(_beneficiary);
-        }
+    /**
+    * @dev Only owner can transfer founds to herself, and only as much as
+    * it is allowed by the tap parameter.
+    */
+    function withdraw() public {
+        daicoGovern.validateWithdrawal();
+        uint256 amount = daicoGovern.updateAmountAvailableToWithdraw();
+        amount = Math.min256(amount, this.balance);
+        wallet.transfer(amount);
+        daicoGovern.amountAvailableToWithdrawAfterWithdrawal(amount);
+    }
 
-        /**
-        * @dev The forwardFunds function should not send any thing to the
-        * owner. It should keep the eth to be delivered as the holders decide.
-        */
-        function _forwardFunds() internal {
-        }
+    /**
+    * @dev Add buyers to the holder list. If you want to allow holders to
+    * change after the selling period you should implement addHolder and
+    * removeHolder functions
+    */
+    function _updatePurchasingState(
+        address _beneficiary,
+        uint256 _weiAmount
+    )
+        internal
+    {
+        daicoGovern.addHolder(_beneficiary);
+    }
 
-
+    /**
+    * @dev The forwardFunds function should not send any thing to the
+    * owner. It should keep the eth to be delivered as the holders decide.
+    */
+    function _forwardFunds() internal {
+    }
 }
