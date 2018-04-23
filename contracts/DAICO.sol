@@ -12,7 +12,6 @@ contract DAICO is Crowdsale {
     using SafeMath for uint256;
 
     DaicoGovern public daicoGovern;
-    address public daicoGovernAddress;
     uint256 public lastWithdrawn;
 
     /*iquorum is the ivnerse quorum. 3 is a 1/3, and so on.*/
@@ -40,9 +39,8 @@ contract DAICO is Crowdsale {
         mapping (address => bool) voted;
     }
 
-    function DAICO(uint256 _rate, address _wallet, ERC20 _token, uint256 _lastWithdrawn, uint256 _iquorum) Crowdsale(_rate, _wallet, _token) public {
-      daicoGovern = new DaicoGovern(_lastWithdrawn, _iquorum);
-      daicoGovernAddress = address(daicoGovern);
+    function DAICO(uint256 _rate, address _wallet, ERC20 _token, uint256 daicoGovernAddress) Crowdsale(_rate, _wallet, _token) public {
+      daicoGovern = DaicoGovern(daicoGovernAddress);
     }
 
 

@@ -38,9 +38,9 @@ contract('DAICO', function (accounts) {
     this.no_purchaser = accounts[3];
     this.owner_initial_balance = web3.eth.getBalance(this.owner);
     this.token = await SimpleToken.new();
-    // this.daicoGovern = await DaicoGovern.new(this.lastWithdrawn, iquorum);
-    this.daico = await DAICO.new(rate, this.owner, this.token.address, this.lastWithdrawn, iquorum);
-    this.daicoGovern = DaicoGovern.at(await this.daico.daicoGovernAddress())
+    this.daicoGovern = await DaicoGovern.new(this.lastWithdrawn, iquorum);
+    this.daico = await DAICO.new(rate, this.owner, this.token.address, this.daicoGovern.address);
+    this.daicoGovern.transferOwnership(this.daico.address)
     await this.token.transfer(this.daico.address, tokenSupply);
 
   });
