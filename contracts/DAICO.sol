@@ -71,7 +71,7 @@ contract DAICO is Crowdsale, Ownable {
         {
             require(proposedNewTap > tap);
             require(isHolder[msg.sender]);
-            require(block.timestamp > lastWithdrawn);
+            require(block.timestamp >= lastWithdrawn);
 
             proposalID = proposals.length++;
             RaiseTapProposal storage proposal = proposals[proposalID];
