@@ -4,46 +4,26 @@ import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import 'zeppelin-solidity/contracts/math/Math.sol';
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import 'zeppelin-solidity/contracts/examples/SimpleToken.sol';
-import './DaicoGovern.sol';
+import './DaicoGovernInterface.sol';
 
 
 contract DAICO is Crowdsale {
     using SafeMath for uint256;
 
-    DaicoGovern public daicoGovern;
-    uint256 public lastWithdrawn;
+    DaicoGovernInterface public daicoGovern;
 
-    /*iquorum is the ivnerse quorum. 3 is a 1/3, and so on.*/
-    uint256 public iquorum;
-    uint256 public quorum;
-    RaiseTapProposal[] public proposals;
-
-    /**
-    * @dev The owner of the contract should implement how the memebers are
-    * added. Probably, some background check to verify its identity will be
-    * needed. Also, a delay could be needed to avoid double voting.
-    */
-    mapping (address => bool) public isHolder;
-
-    event RaiseTapProposalAdded(uint256 proposalID, address author, uint256 amount);
-    event Voted(uint256 proposalID, address voter, bool supports);
-
-    struct RaiseTapProposal {
-        address author;
-        uint256 proposedNewTap;
-        uint256 votingDeadline;
-        bool executed;
-        uint256 numberOfVotes;
-        uint256 numberOfPositiveVotes;
-        mapping (address => bool) voted;
+    function DAICO
+    (
+        uint256 daicoGovernAddress,
+        uint256 _rate,
+        address _wallet,
+        ERC20 _token
+    )
+    public
+    Crowdsale(_rate, _wallet, _token)
+    {
+      daicoGovern = DaicoGovernInterface(daicoGovernAddress);
     }
-
-    function DAICO(uint256 _rate, address _wallet, ERC20 _token, uint256 daicoGovernAddress) Crowdsale(_rate, _wallet, _token) public {
-      daicoGovern = DaicoGovern(daicoGovernAddress);
-    }
-
-
 
     /**
     * @dev Only owner can transfer founds to herself, and only as much as
@@ -78,4 +58,5 @@ contract DAICO is Crowdsale {
     */
     function _forwardFunds() internal {
     }
+
 }
