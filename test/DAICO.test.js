@@ -38,8 +38,8 @@ contract('DAICO', function (accounts) {
     this.no_purchaser = accounts[3];
     this.owner_initial_balance = web3.eth.getBalance(this.owner);
     this.token = await SimpleToken.new();
-    this.daicoGovern = await DaicoGovern.new(this.lastWithdrawn, iquorum);
-    this.daico = await DAICO.new(rate, this.owner, this.token.address, this.daicoGovern.address);
+    this.daicoGovern = await DaicoGovern.new(this.lastWithdrawn, iquorum, this.token.address);
+    this.daico = await DAICO.new(this.daicoGovern.address, rate, this.owner, this.token.address);
     this.daicoGovern.transferOwnership(this.daico.address)
     await this.token.transfer(this.daico.address, tokenSupply);
 
@@ -131,7 +131,7 @@ contract('DAICO', function (accounts) {
         await this.daicoGovern.vote(this.proposalID, true, {from: this.no_purchaser}).should.be.rejectedWith(EVMRevert);
         proposal = await this.daicoGovern.proposals.call(this.proposalID)
         const finalNumberOfVotes = proposal[4];
-        const finalNumberOfPositiveVotes = proposal[5];
+        const finalNumberOfPositiveVotes = proposal[6];
         finalNumberOfVotes.should.be.bignumber.equal(1);
         finalNumberOfPositiveVotes.should.be.bignumber.equal(1);
       });
