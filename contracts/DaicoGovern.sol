@@ -3,6 +3,8 @@ pragma solidity ^0.4.19;
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'zeppelin-solidity/contracts/math/Math.sol';
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zeppelin-solidity/contracts/examples/SimpleToken.sol';
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
 contract DaicoGovern is Ownable {
@@ -16,6 +18,7 @@ contract DaicoGovern is Ownable {
     uint256 public iquorum;
     uint256 public quorum;
     uint256 public numberOfHolders;
+    ERC20 public token;
     RaiseTapProposal[] public proposals;
 
     /**
@@ -34,16 +37,18 @@ contract DaicoGovern is Ownable {
         uint256 votingDeadline;
         bool executed;
         uint256 numberOfVotes;
+        uint256 numberOfNegativeVotes;
         uint256 numberOfPositiveVotes;
         mapping (address => bool) voted;
     }
 
-    function DaicoGovern (uint256 _lastWithdrawn, uint256 _iquorum) public {
+    function DaicoGovern (uint256 _lastWithdrawn, uint256 _iquorum, ERC20 _token) public {
         tap = 0;
         lastWithdrawn = _lastWithdrawn;
         iquorum = _iquorum;
         quorum = 0;
         amountAvailableToWithdraw = 0;
+        token = _token;
     }
 
     /**
@@ -140,11 +145,11 @@ contract DaicoGovern is Ownable {
     /**
     * @dev after a withdrawal updateLastWithdrawal should be called.
     */
-    function amountAvailableToWithdrawAfterWithdrawal(uint256 withdrawn) onlyOwner {
+    function amountAvailableToWithdrawAfterWithdrawal(uint256 withdrawn) onlyOwner public {
         amountAvailableToWithdraw = amountAvailableToWithdraw.sub(withdrawn);
       }
 
-    function addHolder(address holderAdress) onlyOwner {
+    function addHolder(address holderAdress) onlyOwner public {
       isHolder[holderAdress] = true;
       numberOfHolders++;
       if (numberOfHolders % iquorum == 0){
