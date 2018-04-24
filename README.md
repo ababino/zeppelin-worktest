@@ -12,4 +12,8 @@ npm test
 
 TODO
 
-* Make `withdraw` not onlyOwner. maybe
+* Make `withdraw` not onlyOwner. maybe. now onlyOwner can execute a proposal because it trigers a withdrawal.
+
+ OBS
+
+ * Holder can not vote or propose new taps before tap mode is enable. That would allow the initial holder to raise the tap without the consent of the future holders.
