@@ -12,7 +12,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-const DAICO = artifacts.require('DAICO');
+const DAICO = artifacts.require('DAICOold');
 const DaicoGovern = artifacts.require('DaicoGovern');
 const SimpleToken = artifacts.require('SimpleToken');
 
